@@ -8,65 +8,25 @@
 </head>
 <body>
 <main class="host-shell">
-<section class="host-card" aria-live="polite">
+<section class="host-card">
 <div class="brand-mark">PS</div>
 <div class="eyebrow">Offline cache</div>
 <h1 class="title">PS4 Host</h1>
 <p class="subtitle">Firmware chain: 9.00 – 9.60</p>
 <div class="status-wrap">
-<div class="status-row"><span id="cacheDot" class="status-dot busy"></span><span id="msgs" class="status">Preparing offline cache</span></div>
-<div class="hint" id="hint">Installing required offline resources…</div>
+<div class="status-row"><span id="cacheDot" class="status-dot busy"></span><span id="msgs" class="status">Starting cache installation</span></div>
+<div class="hint">Keep this page open until the cache is ready.</div>
 </div>
-<div class="footer">Cache complete · starting jailbreak automatically</div>
+<div class="footer">Close and reopen the browser after installation</div>
 </section>
 </main>
 <script>
-(function(){
-  var dot=document.getElementById('cacheDot');
-  var msg=document.getElementById('msgs');
-  var hint=document.getElementById('hint');
-  var moved=false;
-
-  function go(){
-    if(moved)return;
-    moved=true;
-    dot.classList.remove('busy');
-    msg.textContent='Cache complete · starting jailbreak';
-    hint.textContent='Opening jailbreak process…';
-    setTimeout(function(){
-      // The manifest caches core/index.html under the relative URL "index.html".
-      // autostart tells that page to run the existing exploit chain immediately.
-      window.location.replace('index.html?autostart=1');
-    },120);
-  }
-
-  function progress(e){
-    var p=(e&&e.total)?Math.round((e.loaded/e.total)*100):0;
-    msg.textContent='Preparing offline cache · '+p+'%';
-  }
-
-  function fail(){
-    dot.classList.remove('busy');
-    dot.style.background='var(--danger)';
-    msg.className='status error';
-    msg.textContent='Cache installation failed';
-    hint.textContent='Reload the host and try again.';
-  }
-
-  window.applicationCache.addEventListener('progress',progress,false);
-  window.applicationCache.addEventListener('cached',go,false);
-  window.applicationCache.addEventListener('updateready',function(){
-    try{window.applicationCache.swapCache();}catch(e){}
-    go();
-  },false);
-  window.applicationCache.addEventListener('noupdate',go,false);
-  window.applicationCache.addEventListener('error',fail,false);
-
-  // If the manifest was already installed before this page rendered.
-  if(window.applicationCache.status===1 || window.applicationCache.status===4){
-    setTimeout(go,50);
-  }
-})();
+history.replaceState(null,null,'index.html');var histlength=history.length;history.go(-histlength);
+function DLProgress(e){var p=e.total?Math.round(e.loaded/e.total*100):0;window.msgs.textContent='Installing offline cache · '+p+'%';}
+function DisplayCacheProgress(){window.cacheDot.classList.remove('busy');window.msgs.textContent='Offline cache installed';setTimeout(function(){window.msgs.textContent='Close and reopen the browser';},1500);}
+window.applicationCache.addEventListener('progress',DLProgress,false);
+window.applicationCache.oncached=DisplayCacheProgress;window.applicationCache.onupdateready=DisplayCacheProgress;
+window.applicationCache.onerror=function(){window.cacheDot.classList.remove('busy');window.cacheDot.style.background='var(--danger)';window.msgs.className='status error';window.msgs.textContent='Cache installation failed';};
 </script>
 </body>
 </html>
