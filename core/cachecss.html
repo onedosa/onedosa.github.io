@@ -6,7 +6,8 @@
 <title>PS4 Host — Offline Cache</title>
 <link rel="stylesheet" href="../style.css">
 </head>
-<body><main class="host-shell">
+<body>
+<main class="host-shell">
 <section class="host-card" aria-live="polite">
 <div class="brand-mark">PS</div>
 <div class="eyebrow">Offline cache</div>
@@ -14,9 +15,58 @@
 <p class="subtitle">Firmware chain: 10.00 – 11.02</p>
 <div class="status-wrap">
 <div class="status-row"><span id="cacheDot" class="status-dot busy"></span><span id="msgs" class="status">Preparing offline cache</span></div>
-<div class="hint">Keep this page open while the cache is installed.</div>
+<div class="hint" id="hint">Installing required offline resources…</div>
 </div>
-<div class="footer">Cache ready • starting jailbreak automatically</div>
+<div class="footer">Cache complete · starting jailbreak automatically</div>
 </section>
-</main></body>
+</main>
+<script>
+(function(){
+  var dot=document.getElementById('cacheDot');
+  var msg=document.getElementById('msgs');
+  var hint=document.getElementById('hint');
+  var moved=false;
+
+  function go(){
+    if(moved)return;
+    moved=true;
+    dot.classList.remove('busy');
+    msg.textContent='Cache complete · starting jailbreak';
+    hint.textContent='Opening jailbreak process…';
+    setTimeout(function(){
+      // The manifest caches core/index.html under the relative URL "index.html".
+      // autostart tells that page to run the existing exploit chain immediately.
+      window.location.replace('index.html?autostart=1');
+    },120);
+  }
+
+  function progress(e){
+    var p=(e&&e.total)?Math.round((e.loaded/e.total)*100):0;
+    msg.textContent='Preparing offline cache · '+p+'%';
+  }
+
+  function fail(){
+    dot.classList.remove('busy');
+    dot.style.background='var(--danger)';
+    msg.className='status error';
+    msg.textContent='Cache installation failed';
+    hint.textContent='Reload the host and try again.';
+  }
+
+  window.applicationCache.addEventListener('progress',progress,false);
+  window.applicationCache.addEventListener('cached',go,false);
+  window.applicationCache.addEventListener('updateready',function(){
+    try{window.applicationCache.swapCache();}catch(e){}
+    go();
+  },false);
+  window.applicationCache.addEventListener('noupdate',go,false);
+  window.applicationCache.addEventListener('error',fail,false);
+
+  // If the manifest was already installed before this page rendered.
+  if(window.applicationCache.status===1 || window.applicationCache.status===4){
+    setTimeout(go,50);
+  }
+})();
+</script>
+</body>
 </html>

@@ -40,6 +40,13 @@
     (n>=10&&n<=11.02) ||
     (n>=11.50&&n<=13.52);
 
+  const cachePage=n=>
+    (n===5.05||n===5.07) ? 'core/cache505.html' :
+    (n>=7&&n<=8.52) ? 'core/cache700.html' :
+    (n>=9&&n<=9.60) ? 'core/cache900.html' :
+    (n>=10&&n<=11.02) ? 'core/cachecss.html' :
+    (n>=11.50&&n<=13.52) ? 'core/cacheslopkit.html' : null;
+
   if(!m||Number.isNaN(fw)){
     dot.classList.remove('busy');
     dot.style.background='var(--danger)';
@@ -57,7 +64,7 @@
     dot.style.background='var(--danger)';
     status.textContent='Firmware not supported';
     status.className='status error';
-    hint.textContent=m[1];
+    hint.textContent='Detected firmware '+m[1];
     return;
   }
 
@@ -66,15 +73,27 @@
   hint.textContent='Ready to start';
   start.classList.remove('hidden');
 
-  // UI-only entry point: the user must click the visible button.
-  // No keyboard, gamepad, or "any button" handler is installed.
-  start.addEventListener('click',()=>{
+  let started=false;
+  function begin(){
+    if(started)return;
+    started=true;
     start.disabled=true;
-    start.textContent='Starting…';
-    status.textContent='Starting jailbreak';
-    hint.textContent='Loading firmware chain…';
-    window.location.replace('core/index.html');
-  });
+    start.classList.add('hidden');
+    status.textContent='Preparing offline cache';
+    hint.textContent='Installing firmware chain…';
+
+    const page=cachePage(fw);
+    if(page){
+      window.location.replace(page);
+    }else{
+      status.textContent='Exploit unavailable';
+      status.className='status error';
+    }
+  }
+
+  // Only the visible UI button starts the process.
+  // No keyboard/gamepad/any-button handlers.
+  start.addEventListener('click',begin,false);
 })();
 </script>
 </body>

@@ -12,31 +12,111 @@
 <div class="brand-mark">PS</div>
 <div class="eyebrow">Offline-ready exploit host</div>
 <h1 class="title">PS4 Host</h1>
-<p class="subtitle">Select start to prepare the matching firmware chain.</p>
+<p class="subtitle">Firmware chain is ready.</p>
 <div class="status-wrap">
 <div class="status-row"><span id="dot" class="status-dot busy"></span><span id="status" class="status">Detecting firmware</span></div>
 <div id="fw" class="firmware hidden"></div>
 <div id="hint" class="hint">Please wait…</div>
-<button id="start" class="action hidden">Start</button>
+<button id="start" class="action hidden" type="button">Start Jailbreak</button>
 </div>
 <div class="footer">PS4 exploit host • offline cache supported</div>
 </section>
 </main>
 <script>
 (() => {
-  const status=document.getElementById('status'), fwEl=document.getElementById('fw'), hint=document.getElementById('hint'), dot=document.getElementById('dot'), start=document.getElementById('start');
-  const m=(navigator.userAgent||'').match(/PlayStation 4[ \/]([\d.]+)/i); const fw=m?parseFloat(m[1]):NaN;
-  const supported=n=>(n===5.05||n===5.07)||(n>=7&&n<=8.52)||(n>=9&&n<=9.60)||(n>=10&&n<=11.02)||(n>=11.50&&n<=13.52);
-  const cachePage=n=>n===5.05||n===5.07?'cache505.html':n>=7&&n<=8.52?'cache700.html':n>=9&&n<=9.60?'cache900.html':n>=10&&n<=11.02?'cachecss.html':n>=11.50&&n<=13.52?'cacheslopkit.html':null;
-  const set=(t,c='')=>{status.textContent=t;status.className='status '+c;};
-  if(!m||Number.isNaN(fw)){dot.classList.remove('busy');dot.style.background='var(--danger)';set('Firmware not detected','error');hint.textContent='Open this page in the PS4 system browser.';return;}
-  fwEl.textContent='Firmware '+m[1];fwEl.classList.remove('hidden');
-  if(!supported(fw)){dot.classList.remove('busy');dot.style.background='var(--danger)';set('Firmware not supported','error');hint.textContent=m[1];return;}
-  dot.classList.remove('busy');set('Firmware supported','');hint.textContent='Select Start to begin';start.classList.remove('hidden');
+  const status=document.getElementById('status');
+  const fwEl=document.getElementById('fw');
+  const hint=document.getElementById('hint');
+  const dot=document.getElementById('dot');
+  const start=document.getElementById('start');
+
+  const m=(navigator.userAgent||'').match(/PlayStation 4[ \/]([\d.]+)/i);
+  const fw=m?parseFloat(m[1]):NaN;
+  const auto=new URLSearchParams(location.search).get('autostart')==='1';
+
+  const supported=n=>
+    (n===5.05||n===5.07) ||
+    (n>=7&&n<=8.52) ||
+    (n>=9&&n<=9.60) ||
+    (n>=10&&n<=11.02) ||
+    (n>=11.50&&n<=13.52);
+
+  const set=(t,c='')=>{
+    status.textContent=t;
+    status.className='status '+c;
+  };
+
+  if(!m||Number.isNaN(fw)){
+    dot.classList.remove('busy');
+    dot.style.background='var(--danger)';
+    set('Firmware not detected','error');
+    hint.textContent='Open this page in the PS4 system browser.';
+    return;
+  }
+
+  fwEl.textContent='Firmware '+m[1];
+  fwEl.classList.remove('hidden');
+
+  if(!supported(fw)){
+    dot.classList.remove('busy');
+    dot.style.background='var(--danger)';
+    set('Firmware not supported','error');
+    hint.textContent='Detected firmware '+m[1];
+    return;
+  }
+
   let started=false;
-  function begin(){if(started)return;started=true;start.classList.add('hidden');hint.textContent='Preparing offline cache…';const page=cachePage(fw);if(window.applicationCache&&window.applicationCache.status===0&&page){location.replace(page);return;}load(fw);}
-  function load(n){let src=null,type='';if(n===5.05||n===5.07)src='505/exploit.js';else if(n>=7&&n<=8.52){src='700/alert.js';type='module';}else if(n>=9&&n<=9.60){src='900/alert.js';type='module';}else if(n>=10&&n<=11.02)src='css/main.js';else if(n>=11.50&&n<=12.02){src='slopkit/chain_lapse.js';type='module';}else if(n>=12.50&&n<=13.00){src='slopkit/chain_poops.js';type='module';}else if(n>=13.02&&n<=13.52){src='slopkit/jb.js?v=10';type='module';}if(!src){set('Exploit unavailable','error');return;}set('Starting jailbreak');hint.textContent='Please wait…';const s=document.createElement('script');if(type)s.type=type;s.src=src;s.onerror=()=>set('Exploit resource unavailable','error');if(n>=10&&n<=11.02)s.onload=()=>setTimeout(()=>{if(typeof doJb==='function')doJb();},500);document.head.appendChild(s);}
-  start.addEventListener('click',begin);
+
+  function load(n){
+    let src=null,type='';
+    if(n===5.05||n===5.07) src='505/exploit.js';
+    else if(n>=7&&n<=8.52){src='700/alert.js';type='module';}
+    else if(n>=9&&n<=9.60){src='900/alert.js';type='module';}
+    else if(n>=10&&n<=11.02) src='css/main.js';
+    else if(n>=11.50&&n<=12.02){src='slopkit/chain_lapse.js';type='module';}
+    else if(n>=12.50&&n<=13.00){src='slopkit/chain_poops.js';type='module';}
+    else if(n>=13.02&&n<=13.52){src='slopkit/jb.js?v=10';type='module';}
+
+    if(!src){set('Exploit unavailable','error');return;}
+
+    set('Starting jailbreak');
+    hint.textContent='Loading firmware chain…';
+
+    const s=document.createElement('script');
+    if(type)s.type=type;
+    s.src=src;
+    s.onerror=()=>set('Exploit resource unavailable','error');
+    if(n>=10&&n<=11.02){
+      s.onload=()=>setTimeout(()=>{
+        if(typeof doJb==='function')doJb();
+      },500);
+    }
+    document.head.appendChild(s);
+  }
+
+  function begin(){
+    if(started)return;
+    started=true;
+    start.disabled=true;
+    start.classList.add('hidden');
+    load(fw);
+  }
+
+  dot.classList.remove('busy');
+  set('Firmware supported');
+  hint.textContent=auto?'Cache complete · starting jailbreak':'Ready to start';
+
+  if(auto){
+    // This page was reached from a completed Application Cache install.
+    // All resources are expected to be supplied by that manifest.
+    setTimeout(begin,120);
+  }else{
+    start.textContent='Start Jailbreak';
+    start.classList.remove('hidden');
+    start.addEventListener('click',begin,false);
+  }
+
+  // Intentionally no keydown/keyup/gamepad handlers.
 })();
 </script>
 </body>
