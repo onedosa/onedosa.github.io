@@ -1,100 +1,16 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PS4 Host</title>
-<link rel="stylesheet" href="style.css">
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PS4 System — Exploit & Utility</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <main class="host-shell">
-<section class="host-card" aria-live="polite">
-<div class="brand-mark">PS</div>
-<div class="eyebrow">Offline-ready exploit host</div>
-<h1 class="title">PS4 Host</h1>
-<p class="subtitle">Select start to prepare the matching firmware chain.</p>
-<div class="status-wrap">
-<div class="status-row"><span id="dot" class="status-dot busy"></span><span id="status" class="status">Detecting firmware</span></div>
-<div id="fw" class="firmware hidden"></div>
-<div id="hint" class="hint">Please wait…</div>
-<button id="start" class="action hidden" type="button">Start Jailbreak</button>
-</div>
-<div class="footer">PS4 exploit host • offline cache supported</div>
+<header class="topbar"><div class="brand"><div class="brand-symbol">PS4</div><div class="brand-copy"><div class="brand-name">PS4 System</div><div class="brand-sub">Exploit & Utility</div></div></div><nav class="nav"><span>Home</span><span>Status</span><span>About</span><span>Support</span></nav><div class="version"><i></i>Host v18</div></header>
+<section class="main">
+<div class="hero"><div class="eyebrow">PS4 Utility</div><h1 class="title">Unlock your<br><strong>PlayStation 4</strong></h1><p class="subtitle">A clean, offline-ready launcher for firmware-specific jailbreak chains. Detect your system first, prepare the required cache once, then continue automatically.</p><div class="hero-meta"><div class="meta-item"><div class="meta-label">Payload</div><div class="meta-value">GoldHEN ready</div></div><div class="meta-item"><div class="meta-label">Mode</div><div class="meta-value">Offline capable</div></div><div class="meta-item"><div class="meta-label">Interface</div><div class="meta-value">PS4 Browser</div></div></div></div>
+<div class="system-panel" aria-live="polite"><div class="panel-top"><div><div class="panel-kicker">System check</div><div class="panel-title">Check your PS4</div></div><div id="chip" class="status-chip"><i class="status-dot"></i> Detecting</div></div><div class="firmware-box"><div class="firmware-label">Detected firmware</div><div id="fw" class="firmware">—<span>waiting for browser</span></div><div class="status-row"><span id="dot" class="status-dot busy"></span><span id="status">Detecting firmware…</span></div></div><button id="start" class="action hidden" type="button">Start Jailbreak</button><div id="hint" class="hint">Open this page in the PS4 system browser.</div><div class="supported"><div class="supported-label">Supported firmware families</div><div class="pills"><span class="pill">5.05 / 5.07</span><span class="pill">7.00–8.52</span><span class="pill">9.00–9.60</span><span class="pill">10.00–11.02</span><span class="pill">11.50–13.52</span></div></div></div>
 </section>
+<div class="footer"><div>PS4 System · Exploit & Utility</div><div class="footer-right">Offline cache supported</div></div>
 </main>
 <script>
-(() => {
-  const status=document.getElementById('status');
-  const fwEl=document.getElementById('fw');
-  const hint=document.getElementById('hint');
-  const dot=document.getElementById('dot');
-  const start=document.getElementById('start');
-
-  const m=(navigator.userAgent||'').match(/PlayStation 4[ \/]([\d.]+)/i);
-  const fw=m?parseFloat(m[1]):NaN;
-
-  const supported=n=>
-    (n===5.05||n===5.07) ||
-    (n>=7&&n<=8.52) ||
-    (n>=9&&n<=9.60) ||
-    (n>=10&&n<=11.02) ||
-    (n>=11.50&&n<=13.52);
-
-  const cachePage=n=>
-    (n===5.05||n===5.07) ? 'core/cache505.html' :
-    (n>=7&&n<=8.52) ? 'core/cache700.html' :
-    (n>=9&&n<=9.60) ? 'core/cache900.html' :
-    (n>=10&&n<=11.02) ? 'core/cachecss.html' :
-    (n>=11.50&&n<=13.52) ? 'core/cacheslopkit.html' : null;
-
-  if(!m||Number.isNaN(fw)){
-    dot.classList.remove('busy');
-    dot.style.background='var(--danger)';
-    status.textContent='Firmware not detected';
-    status.className='status error';
-    hint.textContent='Open this page in the PS4 system browser.';
-    return;
-  }
-
-  fwEl.textContent='Firmware '+m[1];
-  fwEl.classList.remove('hidden');
-
-  if(!supported(fw)){
-    dot.classList.remove('busy');
-    dot.style.background='var(--danger)';
-    status.textContent='Firmware not supported';
-    status.className='status error';
-    hint.textContent='Detected firmware '+m[1];
-    return;
-  }
-
-  dot.classList.remove('busy');
-  status.textContent='Firmware supported';
-  hint.textContent='Ready to start';
-  start.classList.remove('hidden');
-
-  let started=false;
-  function begin(){
-    if(started)return;
-    started=true;
-    start.disabled=true;
-    start.classList.add('hidden');
-    status.textContent='Preparing offline cache';
-    hint.textContent='Installing firmware chain…';
-
-    const page=cachePage(fw);
-    if(page){
-      window.location.replace(page);
-    }else{
-      status.textContent='Exploit unavailable';
-      status.className='status error';
-    }
-  }
-
-  // Only the visible UI button starts the process.
-  // No keyboard/gamepad/any-button handlers.
-  start.addEventListener('click',begin,false);
-})();
+(()=>{const $=id=>document.getElementById(id),status=$('status'),fwEl=$('fw'),hint=$('hint'),dot=$('dot'),start=$('start'),chip=$('chip');const m=(navigator.userAgent||'').match(/PlayStation 4[ \/]([\d.]+)/i),fw=m?parseFloat(m[1]):NaN;const supported=n=>(n===5.05||n===5.07)||(n>=7&&n<=8.52)||(n>=9&&n<=9.60)||(n>=10&&n<=11.02)||(n>=11.50&&n<=13.52);const page=n=>(n===5.05||n===5.07)?'core/cache505.html':(n>=7&&n<=8.52)?'core/cache700.html':(n>=9&&n<=9.60)?'core/cache900.html':(n>=10&&n<=11.02)?'core/cachecss.html':(n>=11.50&&n<=13.52)?'core/cacheslopkit.html':null;function error(t,h){dot.classList.remove('busy');dot.style.background='var(--danger)';status.textContent=t;status.className='error';chip.className='status-chip error';chip.innerHTML='<i class="status-dot" style="background:var(--danger);box-shadow:none"></i> Error';hint.textContent=h}if(!m||Number.isNaN(fw)){error('Firmware not detected','Open this page in the PS4 system browser.');fwEl.innerHTML='—<span>browser not detected</span>';return}fwEl.innerHTML=''+m[1]+'<span>PS4 firmware</span>';if(!supported(fw)){error('Firmware not supported','Detected firmware '+m[1]+' is outside the supported ranges.');return}dot.classList.remove('busy');status.textContent='Firmware supported';chip.innerHTML='<i class="status-dot"></i> Ready';hint.textContent='The correct offline cache will be prepared before the jailbreak starts.';start.classList.remove('hidden');let started=false;start.addEventListener('click',()=>{if(started)return;started=true;start.disabled=true;start.textContent='Preparing offline cache…';status.textContent='Preparing offline cache';hint.textContent='Installing the firmware-specific offline resources…';const p=page(fw);if(p)window.location.replace(p);else error('Exploit unavailable','No firmware chain is mapped for this version.')},false)})();
 </script>
-</body>
-</html>
+</body></html>
