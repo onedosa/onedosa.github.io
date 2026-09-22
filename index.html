@@ -3,51 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PS4 HEN</title>
-<style>
-:root{--bg:#050807;--text:#f1f6f3;--muted:#8ea197;--line:#18231d;--green:#39e98b;--green2:#7dffb2}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{background:radial-gradient(circle at 50% 34%,rgba(57,233,139,.055),transparent 34%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-#shell{height:100%;display:flex;align-items:center;justify-content:center;padding:28px}
-#panel{width:min(620px,100%);text-align:center}
-#brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:42px}
-#mark{width:34px;height:34px;border:1px solid rgba(57,233,139,.35);border-radius:50%;display:grid;place-items:center;color:var(--green);font-size:15px;font-weight:700}
-#brandname{font-size:16px;letter-spacing:.22em;font-weight:600}
-#eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
-#status{font-size:28px;line-height:1.2;font-weight:500;letter-spacing:-.02em}
-#detail{margin-top:12px;color:var(--muted);font-size:14px;min-height:20px}
-#dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 18px rgba(57,233,139,.45);display:inline-block;margin-right:9px}
-#loader{width:180px;height:2px;background:#142019;margin:30px auto 0;overflow:hidden}
-#loader i{display:block;width:42%;height:100%;background:var(--green);animation:move 1.2s ease-in-out infinite}
-@keyframes move{0%{transform:translateX(-130%)}100%{transform:translateX(420%)}}
-#start{display:none;margin:32px auto 0;height:48px;min-width:210px;padding:0 28px;border:1px solid rgba(57,233,139,.38);border-radius:8px;background:rgba(57,233,139,.08);color:var(--text);font-size:14px;font-weight:600;cursor:pointer}
-#start:hover{background:rgba(57,233,139,.13);border-color:rgba(57,233,139,.58)}
-.ready #loader{display:none}.ready #start{display:inline-flex;align-items:center;justify-content:center}
-#footer{position:fixed;bottom:22px;left:0;right:0;text-align:center;color:#46564e;font-size:11px;letter-spacing:.08em}
-.ok{color:var(--green2)}
-</style>
+<title>PS4 Host</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="shell"><main id="panel">
-<div id="brand"><div id="mark">P</div><div id="brandname">PS4 HEN</div></div>
-<div id="eyebrow">SYSTEM CHECK</div>
-<div id="status"><span id="dot"></span>Detecting firmware</div>
-<div id="detail">Please wait</div>
-<div id="loader"><i></i></div>
-<button id="start" type="button">Start Jailbreak</button>
-</main></div>
-<div id="footer">OFFLINE-CAPABLE HOST</div>
+<main class="host-shell">
+<section class="host-card" aria-live="polite">
+<div class="brand-mark">PS</div>
+<div class="eyebrow">Offline-ready exploit host</div>
+<h1 class="title">PS4 Host</h1>
+<p class="subtitle">Select start to prepare the matching firmware chain.</p>
+<div class="status-wrap">
+<div class="status-row"><span id="dot" class="status-dot busy"></span><span id="status" class="status">Detecting firmware</span></div>
+<div id="fw" class="firmware hidden"></div>
+<div id="hint" class="hint">Please wait…</div>
+<button id="start" class="action hidden" type="button">Start Jailbreak</button>
+</div>
+<div class="footer">PS4 exploit host • offline cache supported</div>
+</section>
+</main>
 <script>
-(function(){
-"use strict";
-var panel=document.getElementById("panel"),status=document.getElementById("status"),detail=document.getElementById("detail"),start=document.getElementById("start");
-var ua=navigator.userAgent||"",m=/PlayStation\s*4[\/ ](\d+)\.(\d+)/i.exec(ua);
-var fw=m?m[1]+"."+m[2]:"Unknown",num=m?parseInt(m[1],10)*100+parseInt(m[2],10):0;
-var supported=[1302,1304,1350,1352].indexOf(num)>=0;
-detail.textContent="Firmware "+fw;
-function launch(){start.disabled=true;status.innerHTML='<span id="dot"></span>Starting jailbreak';detail.textContent="Loading jailbreak chain";location.href='core/index.html';}
-if(!supported){status.innerHTML='<span id="dot"></span>Firmware not supported';detail.textContent="Detected firmware: "+fw;panel.className="ready";}
-else{status.innerHTML='<span id="dot"></span>Firmware supported';status.className="ok";start.addEventListener("click",launch,false);setTimeout(function(){panel.className="ready";},500);}
+(() => {
+  const status=document.getElementById('status');
+  const fwEl=document.getElementById('fw');
+  const hint=document.getElementById('hint');
+  const dot=document.getElementById('dot');
+  const start=document.getElementById('start');
+
+  const m=(navigator.userAgent||'').match(/PlayStation 4[ \/]([\d.]+)/i);
+  const fw=m?parseFloat(m[1]):NaN;
+
+  const supported=n=>
+    (n===5.05||n===5.07) ||
+    (n>=7&&n<=8.52) ||
+    (n>=9&&n<=9.60) ||
+    (n>=10&&n<=11.02) ||
+    (n>=11.50&&n<=13.52);
+
+  if(!m||Number.isNaN(fw)){
+    dot.classList.remove('busy');
+    dot.style.background='var(--danger)';
+    status.textContent='Firmware not detected';
+    status.className='status error';
+    hint.textContent='Open this page in the PS4 system browser.';
+    return;
+  }
+
+  fwEl.textContent='Firmware '+m[1];
+  fwEl.classList.remove('hidden');
+
+  if(!supported(fw)){
+    dot.classList.remove('busy');
+    dot.style.background='var(--danger)';
+    status.textContent='Firmware not supported';
+    status.className='status error';
+    hint.textContent=m[1];
+    return;
+  }
+
+  dot.classList.remove('busy');
+  status.textContent='Firmware supported';
+  hint.textContent='Ready to start';
+  start.classList.remove('hidden');
+
+  // UI-only entry point: the user must click the visible button.
+  // No keyboard, gamepad, or "any button" handler is installed.
+  start.addEventListener('click',()=>{
+    start.disabled=true;
+    start.textContent='Starting…';
+    status.textContent='Starting jailbreak';
+    hint.textContent='Loading firmware chain…';
+    window.location.replace('core/index.html');
+  });
 })();
 </script>
-</body></html>
+</body>
+</html>

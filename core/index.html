@@ -5,12 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>PS4 Host</title>
 <link rel="stylesheet" href="../style.css">
-<style id="unified-ps4-hen-ui">
-:root{--u-bg:#050807;--u-text:#f1f6f3;--u-muted:#8ea197;--u-green:#39e98b}
-html,body{background:var(--u-bg)!important;color:var(--u-text)!important}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important}
-button,input[type=button],input[type=submit]{font-family:inherit!important;border-radius:8px!important}
-</style></head>
+</head>
 <body>
 <main class="host-shell">
 <section class="host-card" aria-live="polite">
@@ -37,11 +32,11 @@ button,input[type=button],input[type=submit]{font-family:inherit!important;borde
   if(!m||Number.isNaN(fw)){dot.classList.remove('busy');dot.style.background='var(--danger)';set('Firmware not detected','error');hint.textContent='Open this page in the PS4 system browser.';return;}
   fwEl.textContent='Firmware '+m[1];fwEl.classList.remove('hidden');
   if(!supported(fw)){dot.classList.remove('busy');dot.style.background='var(--danger)';set('Firmware not supported','error');hint.textContent=m[1];return;}
-  dot.classList.remove('busy');set('Firmware supported','');hint.textContent='Press any button to start';start.classList.remove('hidden');
+  dot.classList.remove('busy');set('Firmware supported','');hint.textContent='Select Start to begin';start.classList.remove('hidden');
   let started=false;
   function begin(){if(started)return;started=true;start.classList.add('hidden');hint.textContent='Preparing offline cache…';const page=cachePage(fw);if(window.applicationCache&&window.applicationCache.status===0&&page){location.replace(page);return;}load(fw);}
   function load(n){let src=null,type='';if(n===5.05||n===5.07)src='505/exploit.js';else if(n>=7&&n<=8.52){src='700/alert.js';type='module';}else if(n>=9&&n<=9.60){src='900/alert.js';type='module';}else if(n>=10&&n<=11.02)src='css/main.js';else if(n>=11.50&&n<=12.02){src='slopkit/chain_lapse.js';type='module';}else if(n>=12.50&&n<=13.00){src='slopkit/chain_poops.js';type='module';}else if(n>=13.02&&n<=13.52){src='slopkit/jb.js?v=10';type='module';}if(!src){set('Exploit unavailable','error');return;}set('Starting jailbreak');hint.textContent='Please wait…';const s=document.createElement('script');if(type)s.type=type;s.src=src;s.onerror=()=>set('Exploit resource unavailable','error');if(n>=10&&n<=11.02)s.onload=()=>setTimeout(()=>{if(typeof doJb==='function')doJb();},500);document.head.appendChild(s);}
-  start.addEventListener('click',begin);window.addEventListener('keydown',begin,{once:true});window.addEventListener('gamepadbuttondown',begin,{once:true});
+  start.addEventListener('click',begin);
 })();
 </script>
 </body>
