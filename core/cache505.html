@@ -1,0 +1,32 @@
+<!doctype html>
+<html manifest="505.manifest">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PS4 Host — Offline Cache</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main class="host-shell">
+<section class="host-card">
+<div class="brand-mark">PS</div>
+<div class="eyebrow">Offline cache</div>
+<h1 class="title">PS4 Host</h1>
+<p class="subtitle">Firmware chain: 505.05 / 5.07</p>
+<div class="status-wrap">
+<div class="status-row"><span id="cacheDot" class="status-dot busy"></span><span id="msgs" class="status">Starting cache installation</span></div>
+<div class="hint">Keep this page open until the cache is ready.</div>
+</div>
+<div class="footer">Close and reopen the browser after installation</div>
+</section>
+</main>
+<script>
+history.replaceState(null,null,'index.html');var histlength=history.length;history.go(-histlength);
+function DLProgress(e){var p=e.total?Math.round(e.loaded/e.total*100):0;window.msgs.textContent='Installing offline cache · '+p+'%';}
+function DisplayCacheProgress(){window.cacheDot.classList.remove('busy');window.msgs.textContent='Offline cache installed';setTimeout(function(){window.msgs.textContent='Close and reopen the browser';},1500);}
+window.applicationCache.addEventListener('progress',DLProgress,false);
+window.applicationCache.oncached=DisplayCacheProgress;window.applicationCache.onupdateready=DisplayCacheProgress;
+window.applicationCache.onerror=function(){window.cacheDot.classList.remove('busy');window.cacheDot.style.background='var(--danger)';window.msgs.className='status error';window.msgs.textContent='Cache installation failed';};
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>PS4 Host</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="host-shell">
+  <section class="host-card" aria-live="polite">
+    <div class="brand-mark">PS</div>
+    <div class="eyebrow">Offline-ready exploit host</div>
+    <h1 class="title">PS4 Host</h1>
+    <p class="subtitle">A clean local interface for firmware detection and the matching exploit chain.</p>
+    <div class="status-wrap">
+      <div class="status-row"><span id="dot" class="status-dot busy"></span><span id="status" class="status">Detecting firmware</span></div>
+      <div id="firmware" class="firmware hidden"></div>
+      <div id="hint" class="hint">Please wait…</div>
+      <button id="open" class="action hidden">Continue</button>
+    </div>
+    <div class="footer">PS4 exploit host • offline cache supported</div>
+  </section>
+</main>
+<script>
+(() => {
+  const status = document.getElementById('status');
+  const firmware = document.getElementById('firmware');
+  const hint = document.getElementById('hint');
+  const dot = document.getElementById('dot');
+  const open = document.getElementById('open');
+  const match = (navigator.userAgent || '').match(/PlayStation 4[ \/]([\d.]+)/i);
+  const fw = match ? parseFloat(match[1]) : NaN;
+  const fwText = match ? match[1] : '';
+  const supported = n => (n === 5.05 || n === 5.07) || (n >= 7 && n <= 8.52) || (n >= 9 && n <= 9.60) || (n >= 10 && n <= 11.02) || (n >= 11.50 && n <= 13.52);
+
+  function fail(message, detail) {
+    dot.classList.remove('busy');
+    dot.style.background = 'var(--danger)';
+    status.className = 'status error';
+    status.textContent = message;
+    hint.textContent = detail || '';
+  }
+
+  if (!match || Number.isNaN(fw)) {
+    fail('Firmware not detected', 'Open this page in the PS4 system browser.');
+    return;
+  }
+
+  firmware.textContent = 'Firmware ' + fwText;
+  firmware.classList.remove('hidden');
+
+  if (!supported(fw)) {
+    fail('Firmware not supported', 'Detected ' + fwText + '.');
+    return;
+  }
+
+  dot.classList.remove('busy');
+  status.textContent = 'Firmware supported';
+  hint.textContent = 'Loading host interface…';
+  setTimeout(() => location.replace('core/index.html'), 650);
+})();
+</script>
+</body>
+</html>
